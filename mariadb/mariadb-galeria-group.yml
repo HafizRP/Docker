@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mariadb-node1:
+    image: bitnami/mariadb-galera:latest
+    container_name: mariadb-node1
+    environment:
+      - MARIADB_ROOT_PASSWORD=123456
+      - MARIADB_GALERA_CLUSTER_NAME=my_galera
+      - MARIADB_GALERA_CLUSTER_ADDRESS=gcomm://mariadb-node1,mariadb-node2,mariadb-node3
+      - MARIADB_GALERA_NODE_NAME=mariadb-node1
+      - MARIADB_GALERA_NODE_ADDRESS=mariadb-node1
+      - MARIADB_GALERA_FORCE_SAFETOBOOTSTRAP=yes  # Only for node1
+      - MARIADB_GALERA_MARIABACKUP_PASSWORD=your-backup-password  # Backup password
+    ports:
+      - "4044:3306"
+    networks:
+      - galera_net
+    depends_on:
+      - mariadb-node2
+      - mariadb-node3
+
+  mariadb-node2:
+    image: bitnami/mariadb-galera:latest
+    container_name: mariadb-node2
+    environment:
+      - MARIADB_ROOT_PASSWORD=123456
+      - MARIADB_GALERA_CLUSTER_NAME=my_galera
+      - MARIADB_GALERA_CLUSTER_ADDRESS=gcomm://mariadb-node1,mariadb-node2,mariadb-node3
+      - MARIADB_GALERA_NODE_NAME=mariadb-node2
+      - MARIADB_GALERA_NODE_ADDRESS=mariadb-node2
+      - MARIADB_GALERA_MARIABACKUP_PASSWORD=your-backup-password  # Backup password
+    networks:
+      - galera_net
+    depends_on:
+      - mariadb-node1
+
+  mariadb-node3:
+    image: bitnami/mariadb-galera:latest
+    container_name: mariadb-node3
+    environment:
+      - MARIADB_ROOT_PASSWORD=123456
+      - MARIADB_GALERA_CLUSTER_NAME=my_galera
+      - MARIADB_GALERA_CLUSTER_ADDRESS=gcomm://mariadb-node1,mariadb-node2,mariadb-node3
+      - MARIADB_GALERA_NODE_NAME=mariadb-node3
+      - MARIADB_GALERA_NODE_ADDRESS=mariadb-node3
+      - MARIADB_GALERA_MARIABACKUP_PASSWORD=your-backup-password  # Backup password
+    networks:
+      - galera_net
+    depends_on:
+      - mariadb-node1
+
+
+networks:
+  galera_net:
+    driver: bridge

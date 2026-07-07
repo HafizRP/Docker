@@ -1,3 +1,10 @@
 # Mosquitto systme files
 mosquitto.db
 mosquitto.log
+
+# Database data files
+*.frm
+*.ibd
+mysql_data/
+mariadb_data/
+postgres_data/

@@ -1,0 +1,53 @@
+version: "3.8"
+services:
+  mysql1:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    hostname: mysql1
+    networks:
+      mysqlnet:
+        aliases:
+          - mysql1
+    ports:
+      - "3306:3306"
+    command: >
+      --server-id=1
+      --gtid-mode=ON
+      --enforce-gtid-consistency=ON
+      --log-bin=mysql-bin
+      --binlog-format=ROW
+      --master-info-repository=TABLE
+      --relay-log-info-repository=TABLE
+      --transaction-write-set-extraction=XXHASH64
+      --loose-group_replication_group_name="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+      --loose-group_replication_start_on_boot=OFF
+      --loose-group_replication_local_address= "mysql1:33061"
+      --loose-group_replication_group_seeds= "mysql1:33061,mysql2:33061,mysql3:33061"
+      --loose-group_replication_bootstrap_group=OFF
+      --plugin-load=group_replication.so
+
+  mysql2:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    hostname: mysql2
+    networks:
+      mysqlnet:
+        aliases:
+          - mysql2
+    command: [similar to mysql1 but server-id=2 and local_address=mysql2:33061]
+
+  mysql3:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    hostname: mysql3
+    networks:
+      mysqlnet:
+        aliases:
+          - mysql3
+    command: [similar to mysql1 but server-id=3 and local_address=mysql3:33061]
+
+networks:
+  mysqlnet:

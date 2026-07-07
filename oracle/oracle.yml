@@ -1,0 +1,18 @@
+version: '3.1'
+services:
+  oracledb:
+    image: oracle/database:19.3.0-ee
+    container_name: oracledb
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    environment:
+      - ORACLE_SID=ORCLCDB
+      - ORACLE_PDB=ORCLPDB1
+      - ORACLE_PWD=YourPassword
+      - ORACLE_CHARACTERSET=AL32UTF8
+    volumes:  
+      - oracledb-data:/opt/oracle/oradaat
+volumes:
+  oracledb-data:
+    driver: local
