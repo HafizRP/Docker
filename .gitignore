@@ -8,3 +8,19 @@ mosquitto.log
 mysql_data/
 mariadb_data/
 postgres_data/
+
+# 9router data
+9router/data/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment variables
+.env
+**/.env

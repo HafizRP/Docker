@@ -1,16 +1,25 @@
 version: "3.8"
+
 services:
   mysql1:
     image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: 123456
+    container_name: mysql_node_1
+    restart: unless-stopped
+    env_file: .env
     hostname: mysql1
     networks:
       mysqlnet:
         aliases:
           - mysql1
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - mysql1_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     command: >
       --server-id=1
       --gtid-mode=ON
@@ -22,32 +31,81 @@ services:
       --transaction-write-set-extraction=XXHASH64
       --loose-group_replication_group_name="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
       --loose-group_replication_start_on_boot=OFF
-      --loose-group_replication_local_address= "mysql1:33061"
-      --loose-group_replication_group_seeds= "mysql1:33061,mysql2:33061,mysql3:33061"
+      --loose-group_replication_local_address="mysql1:33061"
+      --loose-group_replication_group_seeds="mysql1:33061,mysql2:33061,mysql3:33061"
       --loose-group_replication_bootstrap_group=OFF
       --plugin-load=group_replication.so
 
   mysql2:
     image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: root
+    container_name: mysql_node_2
+    restart: unless-stopped
+    env_file: .env
     hostname: mysql2
     networks:
       mysqlnet:
         aliases:
           - mysql2
-    command: [similar to mysql1 but server-id=2 and local_address=mysql2:33061]
+    volumes:
+      - mysql2_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      --server-id=2
+      --gtid-mode=ON
+      --enforce-gtid-consistency=ON
+      --log-bin=mysql-bin
+      --binlog-format=ROW
+      --master-info-repository=TABLE
+      --relay-log-info-repository=TABLE
+      --transaction-write-set-extraction=XXHASH64
+      --loose-group_replication_group_name="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+      --loose-group_replication_start_on_boot=OFF
+      --loose-group_replication_local_address="mysql2:33061"
+      --loose-group_replication_group_seeds="mysql1:33061,mysql2:33061,mysql3:33061"
+      --loose-group_replication_bootstrap_group=OFF
+      --plugin-load=group_replication.so
 
   mysql3:
     image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: root
+    container_name: mysql_node_3
+    restart: unless-stopped
+    env_file: .env
     hostname: mysql3
     networks:
       mysqlnet:
         aliases:
           - mysql3
-    command: [similar to mysql1 but server-id=3 and local_address=mysql3:33061]
+    volumes:
+      - mysql3_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      --server-id=3
+      --gtid-mode=ON
+      --enforce-gtid-consistency=ON
+      --log-bin=mysql-bin
+      --binlog-format=ROW
+      --master-info-repository=TABLE
+      --relay-log-info-repository=TABLE
+      --transaction-write-set-extraction=XXHASH64
+      --loose-group_replication_group_name="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+      --loose-group_replication_start_on_boot=OFF
+      --loose-group_replication_local_address="mysql3:33061"
+      --loose-group_replication_group_seeds="mysql1:33061,mysql2:33061,mysql3:33061"
+      --loose-group_replication_bootstrap_group=OFF
+      --plugin-load=group_replication.so
 
 networks:
   mysqlnet:
+
+volumes:
+  mysql1_data:
+  mysql2_data:
+  mysql3_data:

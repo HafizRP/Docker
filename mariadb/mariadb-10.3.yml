@@ -1,15 +1,17 @@
-  version: "3.8"
+version: "3.8"
 
-  services:
-    mariadb:
-      image: mariadb:10.3
-      container_name: my-mariadb-container
-      environment:
-        MYSQL_ROOT_PASSWORD: 123456
-        MYSQL_DATABASE: mmbdev
-        MYSQL_USER: admin
-        MYSQL_PASSWORD: 123456
-      ports:
-        - "4043:3306" # Map host port 4040 to container port 3306
-      volumes:
-        - ./mysql_data:/var/lib/mysql # Baris ini sangat penting
+services:
+  mariadb:
+    image: mariadb:10.3
+    container_name: my-mariadb-container
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:4043:3306" # Map host port 4043 to container port 3306
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
