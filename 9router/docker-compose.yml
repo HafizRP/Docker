@@ -6,6 +6,8 @@ services:
     container_name: 9router
     ports:
       - "20128:20128"
+    environment:
+      DATA_DIR: /app/data
     volumes:
-      - ./data:/root/.9router
+      - ./data:/app/data
     restart: unless-stopped
